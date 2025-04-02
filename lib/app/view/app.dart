@@ -1,34 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:parking_app/counter/counter.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:parking_app/home/cubit/home_cubit.dart';
 import 'package:parking_app/l10n/l10n.dart';
-import 'package:parking_app/on_boarding_page.dart';
+import 'package:parking_app/parking_map/cubit/user_current_location/check_location_permission_cubit.dart';
+import 'package:parking_app/parking_map/cubit/user_current_location/get_user_position_cubit.dart';
+import 'package:parking_app/router/go_router.dart';
 import 'package:parking_app/shared/utils/app_colors.dart';
+import 'package:parking_app/shared/utils/app_dark_theme.dart';
+import 'package:parking_app/shared/utils/app_light_theme.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+    // get theme mode on system
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => HomeCubit(),
         ),
-        useMaterial3: true,
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-            elevation: 0,
-          ),
+        BlocProvider<CheckLocationPermissionCubit>(
+          create: (context) => CheckLocationPermissionCubit(),
         ),
+        BlocProvider<GetUserPositionCubit>(
+          create: (context) => GetUserPositionCubit(),
+        ),
+      ],
+      child: MaterialApp.router(
+        routerConfig: GlobalRouter.instance,
+        theme: const AppTheme().themeData,
+        darkTheme: const AppDarkTheme().themeData,
+        themeMode: ThemeMode.light,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        debugShowCheckedModeBanner: false,
       ),
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      home: const OnboardingScreen(),
     );
   }
 }
